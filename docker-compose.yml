@@ -1,0 +1,55 @@
+services:
+  api-nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./api:/app
+      - ./docker/dev/nginx/conf.d:/etc/nginx/conf.d
+    ports:
+      - "8080:80"
+
+  api-php-fpm:
+    image: php:8.3-fpm
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+      DB_HOST: api-postgres
+      DB_USER: app
+      DB_PASSWORD_FILE: /run/secrets/api_db_password
+      DB_NAME: app
+      MAILER_HOST: mailer
+      MAILER_PORT: 1025
+      MAILER_USERNAME: app
+      MAILER_PASSWORD_FILE: /run/secrets/api_mailer_password
+      MAILER_FROM_EMAIL: mail@app.credit
+    volumes:
+      - ./api:/app
+    secrets:
+      - api_db_password
+      - api_mailer_password
+
+  api-postgres:
+    image: postgres:17.0-alpine3.20
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD_FILE: /run/secrets/api_db_password
+      POSTGRES_DB: app
+    secrets:
+      - api_db_password
+    volumes:
+      - api-postgres:/var/lib/postgresql/data
+    ports:
+      - "54321:5432"
+
+  mailer:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+
+secrets:
+  api_db_password:
+    file: ./docker/dev/secrets/api_db_password
+  api_mailer_password:
+    file: ./docker/dev/secrets/api_mailer_password
+
+volumes:
+  api-postgres:
