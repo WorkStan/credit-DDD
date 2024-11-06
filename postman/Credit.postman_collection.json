@@ -1,0 +1,189 @@
+{
+	"info": {
+		"_postman_id": "176fb428-09f6-4926-b4a7-8eeb2f29a467",
+		"name": "Credit",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21167532"
+	},
+	"item": [
+		{
+			"name": "Client",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"first\",\n    \"lastName\": \"last\",\n    \"age\": 22,\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zip\": \"19855\",\n    \"ssn\": \"01156\",\n    \"fico\": 350,\n    \"email\": \"test@GOOGOl.com\",\n    \"phoneCode\": \"+1\",\n    \"phoneNumber\": \"555-66-66\",\n    \"incomeUsdPerMonth\": 1200\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/client",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"second\",\n    \"lastName\": \"last\",\n    \"age\": 23,\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zip\": \"19855\",\n    \"ssn\": \"01156\",\n    \"fico\": 501,\n    \"email\": \"test@GOOG8.com\",\n    \"phoneCode\": \"+1\",\n    \"phoneNumber\": \"555-66-66\",\n    \"incomeUsdPerMonth\": 1200\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/client/5e78d9fc-8bee-42bc-be42-7e44756ac598",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"5e78d9fc-8bee-42bc-be42-7e44756ac598"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clientId\": \"5e78d9fc-8bee-42bc-be42-7e44756ac598\",\n    \"name\": \"test\",\n    \"loanTerm\": 44,\n    \"defaultInterestRate\": 34,\n    \"moneyAmount\": 100,\n    \"moneyCurrency\": \"USD\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/product",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ApplyValidate",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clientId\": \"005d8a36-191a-46d0-aa66-8d914715d704\",\n    \"name\": \"test\",\n    \"loanTerm\": 44,\n    \"defaultInterestRate\": 34,\n    \"moneyAmount\": 100,\n    \"moneyCurrency\": \"USD\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/product/apply-validate/b1866ec0-7bbf-4ec6-8b91-440922605a59",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product",
+								"apply-validate",
+								"b1866ec0-7bbf-4ec6-8b91-440922605a59"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Issue",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/product/issue/b1866ec0-7bbf-4ec6-8b91-440922605a59",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"product",
+								"issue",
+								"b1866ec0-7bbf-4ec6-8b91-440922605a59"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

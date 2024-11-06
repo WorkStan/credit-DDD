@@ -1,0 +1,15 @@
+{
+	"id": "cae901ed-9bce-4a16-8e7a-9cc5757abb92",
+	"values": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"name": "Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2024-11-06T19:14:35.888Z",
+	"_postman_exported_using": "Postman/11.16.1"
+}

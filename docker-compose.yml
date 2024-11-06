@@ -1,34 +1,65 @@
 services:
   api-nginx:
-    image: nginx:1.27-alpine
+    image: nginx:1.27-alpine3.20
     volumes:
       - ./api:/app
       - ./docker/dev/nginx/conf.d:/etc/nginx/conf.d
+    working_dir: /app
+    depends_on:
+      - api-php-fpm
     ports:
       - "8080:80"
 
-  api-php-fpm:
-    image: php:8.3-fpm
+  api-composer:
+    image: composer:2.8.2
+    user: "1000:1000"
     environment:
       APP_ENV: dev
       APP_DEBUG: 1
       DB_HOST: api-postgres
+      DB_PORT: 5432
+      DB_USER: app
+      DB_PASSWORD_FILE: /run/secrets/api_db_password
+      DB_NAME: app
+    secrets:
+      - api_db_password
+    volumes:
+      - ./api:/app
+    working_dir: /app
+
+  api-php-fpm:
+    build:
+      dockerfile: ./docker/dev/php/Dockerfile
+    user: "1000:1000"
+    environment:
+      MESSENGER_TRANSPORT_DSN: doctrine://default
+      APP_ENV: dev
+      APP_DEBUG: 1
+      DB_HOST: api-postgres
+      DB_PORT: 5432
       DB_USER: app
       DB_PASSWORD_FILE: /run/secrets/api_db_password
       DB_NAME: app
       MAILER_HOST: mailer
       MAILER_PORT: 1025
-      MAILER_USERNAME: app
-      MAILER_PASSWORD_FILE: /run/secrets/api_mailer_password
       MAILER_FROM_EMAIL: mail@app.credit
     volumes:
       - ./api:/app
+    working_dir: /app
     secrets:
       - api_db_password
-      - api_mailer_password
+    depends_on:
+      api-postgres:
+        condition: service_healthy
+    restart: always
 
   api-postgres:
     image: postgres:17.0-alpine3.20
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD_FILE: /run/secrets/api_db_password
@@ -48,8 +79,6 @@ services:
 secrets:
   api_db_password:
     file: ./docker/dev/secrets/api_db_password
-  api_mailer_password:
-    file: ./docker/dev/secrets/api_mailer_password
 
 volumes:
   api-postgres:

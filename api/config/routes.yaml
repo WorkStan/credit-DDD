@@ -1,5 +1,5 @@
 controllers:
     resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+        path: ../src/Credit/Presentation/Controller/
+        namespace: App\Credit\Presentation\Controller
     type: attribute

@@ -1,0 +1,78 @@
+doctrine:
+    dbal:
+        dbname: '%env(resolve:DB_NAME)%'
+        host: '%env(resolve:DB_HOST)%'
+        port: '%env(resolve:DB_PORT)%'
+        user: '%env(resolve:DB_USER)%'
+        password: '%env(file:DB_PASSWORD_FILE)%'
+        driver: pdo_pgsql
+#        url: '%env(resolve:DATABASE_URL)%'
+
+        # IMPORTANT: You MUST configure your server version,
+        # either here or in the DATABASE_URL env var (see .env file)
+        #server_version: '16'
+
+        profiling_collect_backtrace: '%kernel.debug%'
+        use_savepoints: true
+        types:
+            client_id: App\Credit\Infrastructure\Doctrine\Types\Client\ClientIdType
+            client_age: App\Credit\Infrastructure\Doctrine\Types\Client\ClientAgeType
+            client_ssn: App\Credit\Infrastructure\Doctrine\Types\Client\ClientSsnType
+            client_fico: App\Credit\Infrastructure\Doctrine\Types\Client\ClientFicoType
+            email: App\Shared\Infrastructure\Doctrine\Types\EmailType
+            zip: App\Shared\Infrastructure\Doctrine\Types\ZipType
+            phone_number: App\Shared\Infrastructure\Doctrine\Types\PhoneNumberType
+            product_id: App\Credit\Infrastructure\Doctrine\Types\Product\ProductIdType
+            product_name: App\Credit\Infrastructure\Doctrine\Types\Product\ProductNameType
+            loan_term: App\Credit\Infrastructure\Doctrine\Types\Product\LoanTermType
+            interest_rate_collection: App\Credit\Infrastructure\Doctrine\Types\Product\InterestRateCollectionType
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        report_fields_where_declared: true
+        validate_xml_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        identity_generation_preferences:
+            Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
+        auto_mapping: true
+        mappings:
+            App\Credit\Domain\Entity:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Credit/Domain/Entity'
+                prefix: 'App\Credit\Domain\Entity'
+                alias: App\Credit\Domain\Entity
+            App\Shared\Entity\Embeddable:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Shared/Entity/Embeddable'
+                prefix: 'App\Shared\Entity\Embeddable'
+                alias: App\Shared\Entity\Embeddable
+        controller_resolver:
+            auto_mapping: false
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    doctrine:
+        orm:
+            auto_generate_proxy_classes: false
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            query_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            result_cache_driver:
+                type: pool
+                pool: doctrine.result_cache_pool
+
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system

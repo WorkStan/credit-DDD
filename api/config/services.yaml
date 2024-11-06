@@ -4,6 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    available_state.condition:
+        - !php/enum App\Shared\Enum\State::CA
+        - !php/enum App\Shared\Enum\State::NY
+        - !php/enum App\Shared\Enum\State::NV
 
 services:
     # default configuration for services in *this* file
@@ -16,9 +20,71 @@ services:
     App\:
         resource: '../src/'
         exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
+            - '../src/Credit/Domain/Entity/'
             - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Credit\Presentation\Controller\:
+        resource: '../src/Credit/Presentation/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Shared\Service\UuidGenerator: ~
+    App\Shared\Service\UuidGeneratorInterface: '@App\Shared\Service\UuidGenerator'
+
+    App\Credit\Infrastructure\Repository\ClientRepository: ~
+    App\Credit\Domain\Repository\ClientRepositoryInterface: '@App\Credit\Infrastructure\Repository\ClientRepository'
+
+    App\Credit\Infrastructure\Repository\ProductRepository: ~
+    App\Credit\Domain\Repository\ProductRepositoryInterface: '@App\Credit\Infrastructure\Repository\ProductRepository'
+
+    App\Shared\Event\EventDispatcherInterface: '@event_dispatcher'
+
+    App\Shared\Infrastructure\Bus\EventBus: ~
+    App\Shared\Bus\EventBusInterface: '@App\Shared\Infrastructure\Bus\EventBus'
+
+    App\Credit\Domain\Service\ApplyCreditCondition\StateCondition: ~
+
+    apply.credit.condition:
+        class: App\Credit\Domain\Service\ApplyCreditCondition\StateCondition
+
+    App\Credit\Domain\Service\ApplyCreditConditionService:
+        class: App\Credit\Domain\Service\ApplyCreditConditionService
+        arguments:
+            - '@App\Credit\Domain\Repository\ClientRepositoryInterface'
+            - '@App\Credit\Domain\Service\ApplyCreditCondition\StateCondition'
+
+    App\Credit\Domain\Service\ValidateCreditCondition\AgeCondition:
+        class: ~
+        arguments:
+            - 18
+            - 60
+
+    App\Credit\Domain\Service\ValidateCreditCondition\AvailableStateCondition:
+        class: ~
+        arguments:
+            - '%available_state.condition%'
+
+    App\Credit\Domain\Service\ValidateCreditCondition\FicoCondition:
+        class: ~
+        arguments:
+            - 500
+
+    App\Credit\Domain\Service\ValidateCreditCondition\IncomeCondition:
+        class: ~
+        arguments:
+            - 1000
+
+    App\Credit\Domain\Service\ValidateCreditCondition\NYStateCondition:
+        class: ~
+
+    App\Credit\Domain\Service\ValidateCreditConditionService:
+        class: App\Credit\Domain\Service\ValidateCreditConditionService
+        arguments:
+            - '@App\Credit\Domain\Repository\ClientRepositoryInterface'
+            - '@App\Credit\Domain\Service\ValidateCreditCondition\AgeCondition'
+            - '@App\Credit\Domain\Service\ValidateCreditCondition\AvailableStateCondition'
+            - '@App\Credit\Domain\Service\ValidateCreditCondition\FicoCondition'
+            - '@App\Credit\Domain\Service\ValidateCreditCondition\IncomeCondition'
+            - '@App\Credit\Domain\Service\ValidateCreditCondition\NYStateCondition'
